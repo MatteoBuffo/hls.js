@@ -60,6 +60,7 @@ export default class BufferController implements ComponentAPI {
   public tracks: TrackSet = {};
   public pendingTracks: TrackSet = {};
   public sourceBuffer!: SourceBuffers;
+  public mediaSource_audio: MediaSource | null = null;
 
   constructor(hls: Hls) {
     this.hls = hls;
