@@ -46,10 +46,35 @@ export class LevelDetails {
   public driftEndTime: number = 0;
   public driftStart: number = 0;
   public driftEnd: number = 0;
+  private interruption: any[];
+  private startInterruption: number;
+  private numberInterruption: number;
+  private comments: any[];
+  private startComment: number;
+  private numberComment: number;
+  private endInterruption: any[];
+  private startEndInterruption: number;
+  private numberEndInterruption: number;
+  private deferred: any[];
+  private gps: any[];
+  private network: any[];
 
   constructor(baseUrl) {
     this.fragments = [];
     this.url = baseUrl;
+    /* AGGIUNTE */
+    this.interruption = [];
+    this.startInterruption = 1;
+    this.numberInterruption = 0;
+    this.comments = [];
+    this.startComment = 1;
+    this.numberComment = 0;
+    this.endInterruption = [];
+    this.startEndInterruption = 1;
+    this.numberEndInterruption = 0;
+    this.deferred = [];
+    this.gps = [];
+    this.network = [];
   }
 
   reloaded(previous: LevelDetails | undefined) {

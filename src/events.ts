@@ -166,6 +166,18 @@ export enum Events {
   LIVE_BACK_BUFFER_REACHED = 'hlsLiveBackBufferReached',
   // fired when the back buffer is reached as defined by the backBufferLength config option - data : { bufferEnd: number }
   BACK_BUFFER_REACHED = 'hlsBackBufferReached',
+  /* AGGIUNTE */
+  // fired to start the loading of waveform-related textual file - data: { frag : fragment object }
+  WAVE_LOAD_STARTED = 'hlsWaveLoadStarted',
+  // ...
+  MEDIA_INFO_LOADED = 'hlsMediaInfoLoaded',
+  PARSE_INFO_LOADED = 'hlsParseInfoLoaded',
+  DEFERRED_LOADED = 'hlsDeferredLoaded',
+  COMMENT_LOADED = 'hlsCommentLoaded',
+  INTERRUPTION_LOADED = 'hlsInterruptionLoaded',
+  INTERRUPTION_END_LOADED = 'hlsInterruptionEndLoaded',
+  GPS_INFO_LOADED = 'hlsGpsInfoLoaded',
+  NETWORK_INFO_LOADED = 'hlsNetworkInfoLoaded',
 }
 
 export interface HlsListeners {
@@ -362,6 +374,17 @@ export interface HlsListeners {
     event: Events.BACK_BUFFER_REACHED,
     data: BackBufferData
   ) => void;
+  [Events.WAVE_LOAD_STARTED]: (event: Events.WAVE_LOAD_STARTED) => void;
+  [Events.MEDIA_INFO_LOADED]: (event: Events.MEDIA_INFO_LOADED) => void;
+  [Events.PARSE_INFO_LOADED]: (event: Events.PARSE_INFO_LOADED) => void;
+  [Events.DEFERRED_LOADED]: (event: Events.DEFERRED_LOADED) => void;
+  [Events.COMMENT_LOADED]: (event: Events.COMMENT_LOADED) => void;
+  [Events.INTERRUPTION_LOADED]: (event: Events.INTERRUPTION_LOADED) => void;
+  [Events.INTERRUPTION_END_LOADED]: (
+    event: Events.INTERRUPTION_END_LOADED
+  ) => void;
+  [Events.GPS_INFO_LOADED]: (event: Events.GPS_INFO_LOADED) => void;
+  [Events.NETWORK_INFO_LOADED]: (event: Events.NETWORK_INFO_LOADED) => void;
 }
 export interface HlsEventEmitter {
   on<E extends keyof HlsListeners, Context = undefined>(

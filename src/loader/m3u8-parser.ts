@@ -34,30 +34,51 @@ const LEVEL_PLAYLIST_REGEX_FAST = new RegExp(
   'g'
 );
 
+// const LEVEL_PLAYLIST_REGEX_SLOW = new RegExp(
+//   [
+//     /#(EXTM3U)/.source,
+//     /#EXT-X-(PLAYLIST-TYPE):(.+)/.source,
+//     /#EXT-X-(MEDIA-SEQUENCE): *(\d+)/.source,
+//     /#EXT-X-(SKIP):(.+)/.source,
+//     /#EXT-X-(TARGETDURATION): *(\d+)/.source,
+//     /#EXT-X-(KEY):(.+)/.source,
+//     /#EXT-X-(START):(.+)/.source,
+//     /#EXT-X-(ENDLIST)/.source,
+//     /#EXT-X-(DISCONTINUITY-SEQ)UENCE: *(\d+)/.source,
+//     /#EXT-X-(DIS)CONTINUITY/.source,
+//     /#EXT-X-(VERSION):(\d+)/.source,
+//     /#EXT-X-(MAP):(.+)/.source,
+//     /#EXT-X-(SERVER-CONTROL):(.+)/.source,
+//     /#EXT-X-(PART-INF):(.+)/.source,
+//     /#EXT-X-(GAP)/.source,
+//     /#EXT-X-(BITRATE):\s*(\d+)/.source,
+//     /#EXT-X-(PART):(.+)/.source,
+//     /#EXT-X-(PRELOAD-HINT):(.+)/.source,
+//     /#EXT-X-(RENDITION-REPORT):(.+)/.source,
+//     /(#)([^:]*):(.*)/.source,
+//     /(#)(.*)(?:.*)\r?\n?/.source,
+//   ].join('|')
+// );
 const LEVEL_PLAYLIST_REGEX_SLOW = new RegExp(
   [
-    /#(EXTM3U)/.source,
-    /#EXT-X-(PLAYLIST-TYPE):(.+)/.source,
-    /#EXT-X-(MEDIA-SEQUENCE): *(\d+)/.source,
-    /#EXT-X-(SKIP):(.+)/.source,
-    /#EXT-X-(TARGETDURATION): *(\d+)/.source,
-    /#EXT-X-(KEY):(.+)/.source,
-    /#EXT-X-(START):(.+)/.source,
-    /#EXT-X-(ENDLIST)/.source,
-    /#EXT-X-(DISCONTINUITY-SEQ)UENCE: *(\d+)/.source,
-    /#EXT-X-(DIS)CONTINUITY/.source,
-    /#EXT-X-(VERSION):(\d+)/.source,
-    /#EXT-X-(MAP):(.+)/.source,
-    /#EXT-X-(SERVER-CONTROL):(.+)/.source,
-    /#EXT-X-(PART-INF):(.+)/.source,
-    /#EXT-X-(GAP)/.source,
-    /#EXT-X-(BITRATE):\s*(\d+)/.source,
-    /#EXT-X-(PART):(.+)/.source,
-    /#EXT-X-(PRELOAD-HINT):(.+)/.source,
-    /#EXT-X-(RENDITION-REPORT):(.+)/.source,
-    /(#)([^:]*):(.*)/.source,
-    /(#)(.*)(?:.*)\r?\n?/.source,
-  ].join('|')
+    /* Estensioni aggiunte:
+      - EXT-RCS-DEFERRED
+      - EXT-RCS-COMMENTS
+      - EXT-RCS-INTERRUPTION
+      - EXT-RCS-ENDINTERRUPTION
+      - EXT-RCS-GPS
+      - EXT-RCS-NETWORK
+  */
+    /(?:(?:#(EXTM3U))|(?:#EXT-X-(PLAYLIST-TYPE):(.+))|(?:#EXT-X-(MEDIA-SEQUENCE): *(\d+))|(?:#EXT-X-(TARGETDURATION): *(\d+))|(?:#EXT-X-(KEY):(.+))|(?:#EXT-X-(START):(.+))|(?:#EXT-X-(ENDLIST))|(?:#EXT-X-(DISCONTINUITY-SEQ)UENCE:(\d+))|(?:#EXT-X-(DIS)CONTINUITY)\/|(?:#EXT-RCS-(DEFERRED):(.+))|(?:#EXT-RCS-(COMMENTS):(.+))|(?:#EXT-RCS-(INTERRUPTION):(.+))|(?:#EXT-RCS-(ENDINTERRUPTION):(.+))|(?:#EXT-RCS-(GPS):(.+))|(?:#EXT-RCS-(NETWORK):(.+)))/,
+    /|(?:#EXT-X-(VERSION):(\d+))/,
+    /|(?:#EXT-X-(MAP):(.+))/,
+    /|(?:(#)([^:]*):(.*))/,
+    /|(?:(#)(.*))(?:.*)\r?\n?/,
+  ]
+    .map(function (r) {
+      return r.source;
+    })
+    .join('')
 );
 
 const MP4_REGEX_SUFFIX = /\.(mp4|m4s|m4v|m4a)$/i;

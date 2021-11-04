@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "webpack --progress && npm run build:types",
+    "build:old": "webpack --progress",
     "build:ci": "webpack && tsc --build tsconfig-lib.json && api-extractor run",
     "build:debug": "webpack --progress --env debug --env demo",
     "build:watch": "webpack --progress --env debug --env demo --watch",

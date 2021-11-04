@@ -60,6 +60,10 @@ export default class BufferController implements ComponentAPI {
   public tracks: TrackSet = {};
   public pendingTracks: TrackSet = {};
   public sourceBuffer!: SourceBuffers;
+
+  /* AGGIUNTE */
+  // @ts-ignore
+  public sb2: SourceBuffer = {};
   public mediaSource_audio: MediaSource | null = null;
 
   constructor(hls: Hls) {
@@ -840,6 +844,18 @@ export default class BufferController implements ComponentAPI {
     sb.ended = false;
     console.assert(!sb.updating, `${type} sourceBuffer must not be updating`);
     sb.appendBuffer(data);
+
+    /*********************************************************
+     AGGIUNTE
+     *********************************************************/
+
+    // Senza if, fallisce quando this.appended >= 3 (i.e. dalla terza volta in poi)
+    if (type === 'audio') {
+      //if(segment.type === 'audio' && this.mediaSource_audio.readyState === 'open'){
+      // @ts-ignore
+      this.sb2.ended = false;
+      this.sb2.appendBuffer(data);
+    }
   }
 
   // Enqueues an operation to each SourceBuffer queue which, upon execution, resolves a promise. When all promises

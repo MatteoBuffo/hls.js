@@ -507,6 +507,12 @@ class PlaylistLoader {
         networkDetails,
         sessionData: null,
       });
+      /* AGGIUNTE */
+      // @ts-ignore
+      hls.trigger(Event.DEFERRED_LOADED, {
+        // @ts-ignore
+        data: hls.levelController._levels[0],
+      });
     }
 
     // save parsing time
