@@ -46,18 +46,18 @@ export class LevelDetails {
   public driftEndTime: number = 0;
   public driftStart: number = 0;
   public driftEnd: number = 0;
-  private interruption: any[];
-  private startInterruption: number;
-  private numberInterruption: number;
-  private comments: any[];
-  private startComment: number;
-  private numberComment: number;
-  private endInterruption: any[];
-  private startEndInterruption: number;
-  private numberEndInterruption: number;
-  private deferred: any[];
-  private gps: any[];
-  private network: any[];
+  public interruption: any[];
+  public startInterruption: number;
+  public numberInterruption: number;
+  public comments: any[];
+  public startComment: number;
+  public numberComment: number;
+  public endInterruption: any[];
+  public startEndInterruption: number;
+  public numberEndInterruption: number;
+  public deferred: any[];
+  public gps: any[];
+  public network: any[];
 
   constructor(baseUrl) {
     this.fragments = [];

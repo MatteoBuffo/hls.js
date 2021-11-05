@@ -59,26 +59,71 @@ const LEVEL_PLAYLIST_REGEX_FAST = new RegExp(
 //     /(#)(.*)(?:.*)\r?\n?/.source,
 //   ].join('|')
 // );
+
+// const LEVEL_PLAYLIST_REGEX_SLOW = new RegExp(
+//   [
+//     /* Estensioni aggiunte:
+//       - EXT-RCS-DEFERRED
+//       - EXT-RCS-COMMENTS
+//       - EXT-RCS-INTERRUPTION
+//       - EXT-RCS-ENDINTERRUPTION
+//       - EXT-RCS-GPS
+//       - EXT-RCS-NETWORK
+//   */
+//     /(?:(?:#(EXTM3U))|(?:#EXT-X-(PLAYLIST-TYPE):(.+))|(?:#EXT-X-(MEDIA-SEQUENCE): *(\d+))|(?:#EXT-X-(TARGETDURATION): *(\d+))|(?:#EXT-X-(KEY):(.+))|(?:#EXT-X-(START):(.+))|(?:#EXT-X-(ENDLIST))|(?:#EXT-X-(DISCONTINUITY-SEQ)UENCE:(\d+))|(?:#EXT-X-(DIS)CONTINUITY)\/|(?:#EXT-RCS-(DEFERRED):(.+))|(?:#EXT-RCS-(COMMENTS):(.+))|(?:#EXT-RCS-(INTERRUPTION):(.+))|(?:#EXT-RCS-(ENDINTERRUPTION):(.+))|(?:#EXT-RCS-(GPS):(.+))|(?:#EXT-RCS-(NETWORK):(.+)))/,
+//     /|(?:#EXT-X-(VERSION):(\d+))/,
+//     /|(?:#EXT-X-(MAP):(.+))/,
+//     /|(?:(#)([^:]*):(.*))/,
+//     /|(?:(#)(.*))(?:.*)\r?\n?/,
+//   ]
+//     .map(function (r) {
+//       return r.source;
+//     })
+//     .join('')
+// );
+
+/* Estensioni aggiunte:
+  - EXT-RCS-DEFERRED
+  - EXT-RCS-COMMENTS
+  - EXT-RCS-INTERRUPTION
+  - EXT-RCS-ENDINTERRUPTION
+  - EXT-RCS-GPS
+  - EXT-RCS-NETWORK
+*/
 const LEVEL_PLAYLIST_REGEX_SLOW = new RegExp(
   [
-    /* Estensioni aggiunte:
-      - EXT-RCS-DEFERRED
-      - EXT-RCS-COMMENTS
-      - EXT-RCS-INTERRUPTION
-      - EXT-RCS-ENDINTERRUPTION
-      - EXT-RCS-GPS
-      - EXT-RCS-NETWORK
-  */
-    /(?:(?:#(EXTM3U))|(?:#EXT-X-(PLAYLIST-TYPE):(.+))|(?:#EXT-X-(MEDIA-SEQUENCE): *(\d+))|(?:#EXT-X-(TARGETDURATION): *(\d+))|(?:#EXT-X-(KEY):(.+))|(?:#EXT-X-(START):(.+))|(?:#EXT-X-(ENDLIST))|(?:#EXT-X-(DISCONTINUITY-SEQ)UENCE:(\d+))|(?:#EXT-X-(DIS)CONTINUITY)\/|(?:#EXT-RCS-(DEFERRED):(.+))|(?:#EXT-RCS-(COMMENTS):(.+))|(?:#EXT-RCS-(INTERRUPTION):(.+))|(?:#EXT-RCS-(ENDINTERRUPTION):(.+))|(?:#EXT-RCS-(GPS):(.+))|(?:#EXT-RCS-(NETWORK):(.+)))/,
-    /|(?:#EXT-X-(VERSION):(\d+))/,
-    /|(?:#EXT-X-(MAP):(.+))/,
-    /|(?:(#)([^:]*):(.*))/,
-    /|(?:(#)(.*))(?:.*)\r?\n?/,
+    /#(EXTM3U)/,
+    /#EXT-X-(PLAYLIST-TYPE):(.+)/,
+    /#EXT-X-(MEDIA-SEQUENCE): *(\d+)/,
+    /#EXT-X-(SKIP):(.+)/,
+    /#EXT-X-(TARGETDURATION): *(\d+)/,
+    /#EXT-X-(KEY):(.+)/,
+    /#EXT-X-(START):(.+)/,
+    /#EXT-X-(ENDLIST)/,
+    /#EXT-X-(DISCONTINUITY-SEQ)UENCE: *(\d+)/,
+    /#EXT-X-(DIS)CONTINUITY/,
+    /#EXT-X-(VERSION):(\d+)/,
+    /#EXT-X-(MAP):(.+)/,
+    /#EXT-X-(SERVER-CONTROL):(.+)/,
+    /#EXT-X-(PART-INF):(.+)/,
+    /#EXT-X-(GAP)/,
+    /#EXT-X-(BITRATE):\s*(\d+)/,
+    /#EXT-X-(PART):(.+)/,
+    /#EXT-X-(PRELOAD-HINT):(.+)/,
+    /#EXT-X-(RENDITION-REPORT):(.+)/,
+    /(#)([^:]*):(.*)/,
+    /(#)(.*)(?:.*)\r?\n?/,
+    /(?:#EXT-RCS-(DEFERRED):(.+))/,
+    /(?:#EXT-RCS-(COMMENTS):(.+))/,
+    /(?:#EXT-RCS-(INTERRUPTION):(.+))/,
+    /(?:#EXT-RCS-(ENDINTERRUPTION):(.+))/,
+    /(?:#EXT-RCS-(GPS):(.+))/,
+    /(?:#EXT-RCS-(NETWORK):(.+))/,
   ]
     .map(function (r) {
       return r.source;
     })
-    .join('')
+    .join('|')
 );
 
 const MP4_REGEX_SUFFIX = /\.(mp4|m4s|m4v|m4a)$/i;
@@ -510,6 +555,57 @@ export default class M3U8Parser {
             const renditionReportAttrs = new AttrList(value1);
             level.renditionReports = level.renditionReports || [];
             level.renditionReports.push(renditionReportAttrs);
+            break;
+          }
+          /* AGGIUNTE */
+          case 'DEFERRED': {
+            console.log('DEFERRED: ' + result);
+            level.deferred.push([
+              parseInt(value1.split(',')[0]),
+              parseInt(value1.split(',')[1]),
+              value1.split(',')[2],
+            ]);
+            //           level.startDeferred++;
+            //           level.numberDeferred++; //level.deferredParams = [parseInt(value1),parseInt(value2)];
+            //           //console.log("DEFERRED: " + level.deferredParams);
+            break;
+          }
+          case 'COMMENTS': {
+            console.log('COMMENTS');
+            // @ts-ignore
+            frag.comments.push(value1);
+            //           frag.startComment++;
+            //           frag.numberComment++;
+            //           level.comments.push(value1);
+            //           level.startComment++;
+            //           level.numberComment++;
+            break;
+          }
+          case 'INTERRUPTION': {
+            // @ts-ignore
+            frag.interruption.push(value1);
+            //           frag.startInterruption++;
+            //           frag.numberInterruption++;
+            level.interruption.push(value1);
+            //           level.startInterruption++;
+            //           level.numberIterruption++;
+            break;
+          }
+          case 'ENDINTERRUPTION': {
+            // @ts-ignore
+            frag.endInterruption.push(value1);
+            //           frag.startEndInterruption++;
+            //           frag.numberEndInterruption++;
+            break;
+          }
+          case 'GPS': {
+            // @ts-ignore
+            frag.gps.push(value1);
+            break;
+          }
+          case 'NETWORK': {
+            // @ts-ignore
+            frag.network.push(value1);
             break;
           }
           default:

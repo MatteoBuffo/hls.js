@@ -142,6 +142,20 @@ export class Fragment extends BaseSegment {
   // The Media Initialization Section for this segment
   public initSegment: Fragment | null = null;
 
+  /* AGGIUNTE */
+  public interruption = [];
+  public startInterruption = 1;
+  public numberInterruption = 0;
+  public comments = [];
+  public startComment = 1;
+  public numberComment = 0;
+  public endInterruption = [];
+  public startEndInterruption = 1;
+  public numberEndInterruption = 0;
+  public deferred = [];
+  public gps = [];
+  public network = [];
+
   constructor(type: PlaylistLevelType, baseurl: string) {
     super(baseurl);
     this.type = type;

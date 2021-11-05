@@ -1018,6 +1018,42 @@ export default class StreamController
       if (!data || hls.nextLoadLevel || this.fragContextChanged(frag)) {
         return;
       }
+
+      /* AGGIUNTE */
+      var message = '\n\nChunk: ' + frag.relurl;
+      // @ts-ignore
+      message +=
+        '\nDurata: ' +
+        frag.duration +
+        ', Posizione: ' +
+        frag.start +
+        ', Size: ' +
+        // frag.loaded;
+        // @ts-ignore
+        this.hls.trigger(Event.PARSE_INFO_LOADED, message);
+      if (frag.comments.length > 0) {
+        // @ts-ignore
+        this.hls.trigger(Event.COMMENT_LOADED, frag.comments[0]);
+      }
+      if (frag.interruption.length > 0) {
+        // @ts-ignore
+        this.hls.trigger(Event.INTERRUPTION_LOADED, frag.interruption[0]);
+      }
+      if (frag.endInterruption.length > 0)
+        this.hls.trigger(
+          // @ts-ignore
+          Event.INTERRUPTION_END_LOADED,
+          frag.endInterruption[0]
+        );
+      if (frag.gps.length > 0) {
+        // @ts-ignore
+        this.hls.trigger(Event.GPS_INFO_LOADED, frag.gps[0]);
+      }
+      if (frag.network.length > 0) {
+        // @ts-ignore
+        this.hls.trigger(Event.NETWORK_INFO_LOADED, frag.network[0]);
+      }
+
       this.fragLoadError = 0;
       this.state = State.IDLE;
       this.startFragRequested = false;

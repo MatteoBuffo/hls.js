@@ -7890,7 +7890,19 @@ var StreamController = /*#__PURE__*/function (_BaseStreamController) {
       if (!data || hls.nextLoadLevel || _this2.fragContextChanged(frag)) {
         return;
       }
+      /* AGGIUNTE */
 
+
+      var message = "\n\nChunk: " + frag.relurl;
+      message += "\nDurata: " + frag.duration + ", Posizione: " + frag.start + ", Size: " + frag.loaded;
+
+      _this2.hls.trigger(Event.PARSE_INFO_LOADED, message);
+
+      if (frag.comments.length > 0) _this2.hls.trigger(Event.COMMENT_LOADED, frag.comments[0]);
+      if (frag.interruption.length > 0) _this2.hls.trigger(Event.INTERRUPTION_LOADED, frag.interruption[0]);
+      if (frag.endInterruption.length > 0) _this2.hls.trigger(Event.INTERRUPTION_END_LOADED, frag.endInterruption[0]);
+      if (frag.gps.length > 0) _this2.hls.trigger(Event.GPS_INFO_LOADED, frag.gps[0]);
+      if (frag.network.length > 0) _this2.hls.trigger(Event.NETWORK_INFO_LOADED, frag.network[0]);
       _this2.fragLoadError = 0;
       _this2.state = _base_stream_controller__WEBPACK_IMPORTED_MODULE_1__["State"].IDLE;
       _this2.startFragRequested = false;
@@ -14547,6 +14559,8 @@ var Fragment = /*#__PURE__*/function (_BaseSegment) {
   // A flag indicating whether the segment was downloaded in order to test bitrate, and was not buffered
   // #EXTINF  segment title
   // The Media Initialization Section for this segment
+
+  /* AGGIUNTE */
   function Fragment(type, baseurl) {
     var _this;
 
@@ -14577,6 +14591,18 @@ var Fragment = /*#__PURE__*/function (_BaseSegment) {
     _this.bitrateTest = false;
     _this.title = null;
     _this.initSegment = null;
+    _this.interruption = [];
+    _this.startInterruption = 1;
+    _this.numberInterruption = 0;
+    _this.comments = [];
+    _this.startComment = 1;
+    _this.numberComment = 0;
+    _this.endInterruption = [];
+    _this.startEndInterruption = 1;
+    _this.numberEndInterruption = 0;
+    _this.deferred = [];
+    _this.gps = [];
+    _this.network = [];
     _this.type = type;
     return _this;
   }
@@ -15312,8 +15338,28 @@ var LEVEL_PLAYLIST_REGEX_FAST = new RegExp([/#EXTINF:\s*(\d*(?:\.\d+)?)(?:,(.*)\
 //     /(#)(.*)(?:.*)\r?\n?/.source,
 //   ].join('|')
 // );
+// const LEVEL_PLAYLIST_REGEX_SLOW = new RegExp(
+//   [
+//     /* Estensioni aggiunte:
+//       - EXT-RCS-DEFERRED
+//       - EXT-RCS-COMMENTS
+//       - EXT-RCS-INTERRUPTION
+//       - EXT-RCS-ENDINTERRUPTION
+//       - EXT-RCS-GPS
+//       - EXT-RCS-NETWORK
+//   */
+//     /(?:(?:#(EXTM3U))|(?:#EXT-X-(PLAYLIST-TYPE):(.+))|(?:#EXT-X-(MEDIA-SEQUENCE): *(\d+))|(?:#EXT-X-(TARGETDURATION): *(\d+))|(?:#EXT-X-(KEY):(.+))|(?:#EXT-X-(START):(.+))|(?:#EXT-X-(ENDLIST))|(?:#EXT-X-(DISCONTINUITY-SEQ)UENCE:(\d+))|(?:#EXT-X-(DIS)CONTINUITY)\/|(?:#EXT-RCS-(DEFERRED):(.+))|(?:#EXT-RCS-(COMMENTS):(.+))|(?:#EXT-RCS-(INTERRUPTION):(.+))|(?:#EXT-RCS-(ENDINTERRUPTION):(.+))|(?:#EXT-RCS-(GPS):(.+))|(?:#EXT-RCS-(NETWORK):(.+)))/,
+//     /|(?:#EXT-X-(VERSION):(\d+))/,
+//     /|(?:#EXT-X-(MAP):(.+))/,
+//     /|(?:(#)([^:]*):(.*))/,
+//     /|(?:(#)(.*))(?:.*)\r?\n?/,
+//   ]
+//     .map(function (r) {
+//       return r.source;
+//     })
+//     .join('')
+// );
 
-var LEVEL_PLAYLIST_REGEX_SLOW = new RegExp([
 /* Estensioni aggiunte:
   - EXT-RCS-DEFERRED
   - EXT-RCS-COMMENTS
@@ -15322,9 +15368,10 @@ var LEVEL_PLAYLIST_REGEX_SLOW = new RegExp([
   - EXT-RCS-GPS
   - EXT-RCS-NETWORK
 */
-/(?:(?:#(EXTM3U))|(?:#EXT-X-(PLAYLIST-TYPE):(.+))|(?:#EXT-X-(MEDIA-SEQUENCE): *(\d+))|(?:#EXT-X-(TARGETDURATION): *(\d+))|(?:#EXT-X-(KEY):(.+))|(?:#EXT-X-(START):(.+))|(?:#EXT-X-(ENDLIST))|(?:#EXT-X-(DISCONTINUITY-SEQ)UENCE:(\d+))|(?:#EXT-X-(DIS)CONTINUITY)\/|(?:#EXT-RCS-(DEFERRED):(.+))|(?:#EXT-RCS-(COMMENTS):(.+))|(?:#EXT-RCS-(INTERRUPTION):(.+))|(?:#EXT-RCS-(ENDINTERRUPTION):(.+))|(?:#EXT-RCS-(GPS):(.+))|(?:#EXT-RCS-(NETWORK):(.+)))/, /|(?:#EXT-X-(VERSION):(\d+))/, /|(?:#EXT-X-(MAP):(.+))/, /|(?:(#)([^:]*):(.*))/, /|(?:(#)(.*))(?:.*)\r?\n?/].map(function (r) {
+
+var LEVEL_PLAYLIST_REGEX_SLOW = new RegExp([/#(EXTM3U)/, /#EXT-X-(PLAYLIST-TYPE):(.+)/, /#EXT-X-(MEDIA-SEQUENCE): *(\d+)/, /#EXT-X-(SKIP):(.+)/, /#EXT-X-(TARGETDURATION): *(\d+)/, /#EXT-X-(KEY):(.+)/, /#EXT-X-(START):(.+)/, /#EXT-X-(ENDLIST)/, /#EXT-X-(DISCONTINUITY-SEQ)UENCE: *(\d+)/, /#EXT-X-(DIS)CONTINUITY/, /#EXT-X-(VERSION):(\d+)/, /#EXT-X-(MAP):(.+)/, /#EXT-X-(SERVER-CONTROL):(.+)/, /#EXT-X-(PART-INF):(.+)/, /#EXT-X-(GAP)/, /#EXT-X-(BITRATE):\s*(\d+)/, /#EXT-X-(PART):(.+)/, /#EXT-X-(PRELOAD-HINT):(.+)/, /#EXT-X-(RENDITION-REPORT):(.+)/, /(#)([^:]*):(.*)/, /(#)(.*)(?:.*)\r?\n?/, /(?:#EXT-RCS-(DEFERRED):(.+))/, /(?:#EXT-RCS-(COMMENTS):(.+))/, /(?:#EXT-RCS-(INTERRUPTION):(.+))/, /(?:#EXT-RCS-(ENDINTERRUPTION):(.+))/, /(?:#EXT-RCS-(GPS):(.+))/, /(?:#EXT-RCS-(NETWORK):(.+))/].map(function (r) {
   return r.source;
-}).join(''));
+}).join('|'));
 var MP4_REGEX_SUFFIX = /\.(mp4|m4s|m4v|m4a)$/i;
 
 function isMP4Url(url) {
@@ -15771,6 +15818,61 @@ var M3U8Parser = /*#__PURE__*/function () {
               var renditionReportAttrs = new _utils_attr_list__WEBPACK_IMPORTED_MODULE_5__["AttrList"](value1);
               level.renditionReports = level.renditionReports || [];
               level.renditionReports.push(renditionReportAttrs);
+              break;
+            }
+
+          /* AGGIUNTE */
+
+          case 'DEFERRED':
+            {
+              console.log("DEFERRED: " + result);
+              level.deferred.push([parseInt(value1.split(",")[0]), parseInt(value1.split(",")[1]), value1.split(",")[2]]); //           level.startDeferred++;
+              //           level.numberDeferred++; //level.deferredParams = [parseInt(value1),parseInt(value2)];
+              //           //console.log("DEFERRED: " + level.deferredParams);
+
+              break;
+            }
+
+          case 'COMMENTS':
+            {
+              console.log("COMMENTS");
+              frag.comments.push(value1); //           frag.startComment++;
+              //           frag.numberComment++;
+              //           level.comments.push(value1);
+              //           level.startComment++;
+              //           level.numberComment++;
+
+              break;
+            }
+
+          case 'INTERRUPTION':
+            {
+              frag.interruption.push(value1); //           frag.startInterruption++;
+              //           frag.numberInterruption++;
+
+              level.interruption.push(value1); //           level.startInterruption++;
+              //           level.numberIterruption++;
+
+              break;
+            }
+
+          case 'ENDINTERRUPTION':
+            {
+              frag.endInterruption.push(value1); //           frag.startEndInterruption++;
+              //           frag.numberEndInterruption++;
+
+              break;
+            }
+
+          case 'GPS':
+            {
+              frag.gps.push(value1);
+              break;
+            }
+
+          case 'NETWORK':
+            {
+              frag.network.push(value1);
               break;
             }
 
